@@ -1,0 +1,90 @@
+<canvas id="gc" width="800" height="600"></canvas>
+
+<script>
+    window.onload=function() {
+        canvas = document.getElementById("gc");
+        ctx = canvas.getContext("2d");
+        setInterval(update, 1000/30);
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
+        for(i = 0; i < 50; i++) {
+            platform.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                w: Math.random() * 100+30,
+                h: Math.random() * 30+20,
+            });
+        }
+    }
+
+    px = py = 200;
+    xv = yv = 0;
+    gravity = 0.5;
+    onG = false;
+    holdLeft = holdRight = false;
+    platform = [];
+
+    function update() {
+        if (holdLeft) {
+            xv = -2;
+        }
+        if (holdRight) {
+            xv = 2;
+        }
+        px += xv;
+        py += yv;
+        if (onG) {
+            xv *= 0.8;
+        } else {
+            yv += gravity;
+        }
+        
+        onG = false;
+        for(i = 0; i < 50; i++) {
+            if (px > platform[i].x && px < platform[i].x + platform[i].w && 
+                py > platform[i].y && py < platform[i].y + platform[i].h) {
+                   py = platform[i].y;
+                   onG = true;     
+                }       
+        }
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.fillRect(px - 5, py - 20, 10, 20);
+        for(i = 0; i < 50; i++) {
+            ctx.fillRect(platform[i].x, platform[i].y, platform[i].w, platform[i].h);
+        }
+    }
+    function keyDown(evt) {
+        switch(evt.keyCode) {
+            case 37:
+                holdLeft = true;
+                break;
+            case 38:
+                // if on ground
+                if(onG) {
+                    yv = -10;
+                }
+                break;
+            case 39:
+                holdRight = true;
+                break;
+        }
+    }
+    function keyUp(evt) {
+        switch(evt.keyCode) {
+            case 37:
+                holdLeft = false;
+                break;
+            case 38:
+                // if on ground
+                if(yv < -3) {
+                    yv = -3;
+                }
+                break;
+            case 39:
+                holdRight = false;
+                break;
+        }
+    }
+</script>
